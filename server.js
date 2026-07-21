@@ -4,10 +4,11 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
+
 /*
 ========================================
-允許前端跨網域呼叫 API
-之後 GitHub Pages 會呼叫這個後端
+CORS
+允許 GitHub Pages 前端呼叫
 ========================================
 */
 
@@ -23,6 +24,11 @@ app.use((req, res, next) => {
     "Content-Type"
   );
 
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, OPTIONS"
+  );
+
   next();
 
 });
@@ -30,7 +36,7 @@ app.use((req, res, next) => {
 
 /*
 ========================================
-首頁測試
+首頁 API 狀態
 ========================================
 */
 
@@ -40,8 +46,14 @@ app.get("/", (req, res) => {
 
     success: true,
 
+    service:
+      "Vehicle Risk Check API",
+
     message:
-      "車輛風險查詢 API 正常運作"
+      "車輛風險查詢 API 正常運作",
+
+    version:
+      "1.1.0"
 
   });
 
@@ -50,21 +62,306 @@ app.get("/", (req, res) => {
 
 /*
 ========================================
-失竊車輛／車牌查詢 API
+牌照種類
+========================================
+*/
 
-使用方式：
+const VEHICLE_TYPES = {
 
-/api/vehicle?type=A&plate=ABC-1234
+  A: "汽車",
 
-type:
-A = 汽車
-B = 重機車
-C = 輕機車
-S = 微電車
-T = 拖車
-G = 動力機械車
-TEMP = 臨時牌
-R = 試車牌
+  B: "重機車",
+
+  C: "輕機車",
+
+  S: "微電車",
+
+  T: "拖車",
+
+  G: "動力機械車",
+
+  TEMP: "臨時牌",
+
+  R: "試車牌"
+
+};
+
+
+/*
+========================================
+簡易 CSV 單行解析器
+
+支援：
+一般欄位
+"含逗號的欄位"
+"" 雙引號跳脫
+========================================
+*/
+
+function parseCsvLine(line) {
+
+  const values = [];
+
+  let current = "";
+
+  let insideQuotes = false;
+
+
+  for (
+    let i = 0;
+    i < line.length;
+    i++
+  ) {
+
+    const char = line[i];
+
+
+    if (char === '"') {
+
+      /*
+      CSV 裡的 ""
+      代表一個雙引號
+      */
+
+      if (
+        insideQuotes &&
+        line[i + 1] === '"'
+      ) {
+
+        current += '"';
+
+        i++;
+
+      }
+
+      else {
+
+        insideQuotes =
+          !insideQuotes;
+
+      }
+
+    }
+
+    else if (
+      char === "," &&
+      !insideQuotes
+    ) {
+
+      values.push(
+        current.trim()
+      );
+
+      current = "";
+
+    }
+
+    else {
+
+      current += char;
+
+    }
+
+  }
+
+
+  values.push(
+    current.trim()
+  );
+
+
+  return values;
+
+}
+
+
+/*
+========================================
+解析警政署 CSV
+========================================
+*/
+
+function parseOfficialCsv(csvText) {
+
+  /*
+  去除 BOM
+  統一換行
+  */
+
+  const cleaned =
+
+    String(csvText || "")
+
+      .replace(/^\uFEFF/, "")
+
+      .replace(/\r\n/g, "\n")
+
+      .replace(/\r/g, "\n")
+
+      .trim();
+
+
+  if (!cleaned) {
+
+    throw new Error(
+      "官方服務回傳空白內容"
+    );
+
+  }
+
+
+  /*
+  移除空白行
+  */
+
+  const lines =
+
+    cleaned
+
+      .split("\n")
+
+      .map(
+        line => line.trim()
+      )
+
+      .filter(Boolean);
+
+
+  /*
+  找 CSV 標題列
+
+  預期：
+  車型,車牌,失車查詢結果,查詢時間
+  */
+
+  const headerIndex =
+
+    lines.findIndex(
+
+      line =>
+
+        line.includes("車型") &&
+
+        line.includes("車牌") &&
+
+        line.includes("失車查詢結果")
+
+    );
+
+
+  if (headerIndex === -1) {
+
+    throw new Error(
+      "無法辨識官方資料格式"
+    );
+
+  }
+
+
+  /*
+  標題下一行才是查詢資料
+  */
+
+  const dataLine =
+    lines[headerIndex + 1];
+
+
+  if (!dataLine) {
+
+    throw new Error(
+      "官方資料沒有查詢結果列"
+    );
+
+  }
+
+
+  const values =
+    parseCsvLine(dataLine);
+
+
+  if (values.length < 4) {
+
+    throw new Error(
+      "官方查詢結果欄位不完整"
+    );
+
+  }
+
+
+  const vehicleType =
+    values[0];
+
+  const plateNumber =
+    values[1];
+
+  const resultText =
+    values[2];
+
+  const queryTime =
+    values[3];
+
+
+  /*
+  ========================================
+  判定官方結果狀態
+
+  NOT_FOUND：
+  官方本次回傳「查無資料」
+
+  RECORD_FOUND：
+  官方回傳非「查無資料」的失車結果
+
+  注意：
+  RECORD_FOUND 不自行延伸解讀犯罪事實
+  ========================================
+  */
+
+  let status;
+
+
+  if (
+    resultText.includes(
+      "查無資料"
+    )
+  ) {
+
+    status =
+      "NOT_FOUND";
+
+  }
+
+  else {
+
+    status =
+      "RECORD_FOUND";
+
+  }
+
+
+  return {
+
+    vehicleType,
+
+    plateNumber,
+
+    status,
+
+    resultText,
+
+    queryTime
+
+  };
+
+}
+
+
+/*
+========================================
+車輛失竊／車牌失竊查詢 API
+
+範例：
+
+/api/vehicle?type=A&plate=AXW-3000
 ========================================
 */
 
@@ -76,88 +373,131 @@ app.get(
     try {
 
       /*
-      取得參數
+      ========================================
+      取得查詢參數
+      ========================================
       */
 
       const type =
+
         String(
           req.query.type || ""
         )
-        .trim()
-        .toUpperCase();
+
+          .trim()
+
+          .toUpperCase();
 
 
       const plate =
+
         String(
           req.query.plate || ""
         )
-        .trim()
-        .toUpperCase()
-        .replace(/\s+/g, "");
+
+          .trim()
+
+          .toUpperCase()
+
+          .replace(/\s+/g, "");
 
 
       /*
-      檢查是否輸入
+      ========================================
+      基本驗證
+      ========================================
       */
 
       if (!type || !plate) {
 
-        return res.status(400).json({
+        return res
+          .status(400)
+          .json({
 
-          success: false,
+            success: false,
 
-          message:
-            "請提供牌照種類與車牌號碼"
+            code:
+              "MISSING_PARAMETERS",
 
-        });
+            message:
+              "請提供牌照種類與車牌號碼"
+
+          });
 
       }
-
-
-      /*
-      限制合法牌照種類
-      */
-
-      const allowedTypes = [
-
-        "A",
-        "B",
-        "C",
-        "S",
-        "T",
-        "G",
-        "TEMP",
-        "R"
-
-      ];
 
 
       if (
-        !allowedTypes.includes(type)
+        !Object.prototype
+          .hasOwnProperty
+          .call(
+            VEHICLE_TYPES,
+            type
+          )
       ) {
 
-        return res.status(400).json({
+        return res
+          .status(400)
+          .json({
 
-          success: false,
+            success: false,
 
-          message:
-            "不支援的牌照種類"
+            code:
+              "INVALID_VEHICLE_TYPE",
 
-        });
+            message:
+              "不支援的牌照種類"
+
+          });
 
       }
 
 
       /*
-      建立警政署官方查詢網址
+      車牌只允許基本合理字元
+
+      不在這裡過度限制格式，
+      因為不同牌照種類格式不同。
+      */
+
+      if (
+        !/^[A-Z0-9\-]+$/.test(
+          plate
+        )
+      ) {
+
+        return res
+          .status(400)
+          .json({
+
+            success: false,
+
+            code:
+              "INVALID_PLATE_FORMAT",
+
+            message:
+              "車牌號碼格式不正確"
+
+          });
+
+      }
+
+
+      /*
+      ========================================
+      建立官方查詢參數
+      ========================================
       */
 
       const params =
+
         new URLSearchParams({
 
-          vehType: type,
+          vehType:
+            type,
 
-          vehNumber: plate
+          vehNumber:
+            plate
 
         });
 
@@ -172,39 +512,53 @@ app.get(
 
 
       /*
-      向官方資料來源查詢
+      ========================================
+      呼叫警政署公開資料服務
+      ========================================
       */
 
       const response =
+
         await fetch(
+
           officialUrl,
+
           {
 
-            method: "GET",
+            method:
+              "GET",
 
             headers: {
 
               "User-Agent":
-                "Vehicle-Risk-Check/1.0",
+                "Vehicle-Risk-Check/1.1",
 
               "Accept":
                 "text/csv,text/plain,*/*"
 
-            }
+            },
+
+            signal:
+              AbortSignal.timeout(
+                15000
+              )
 
           }
+
         );
 
 
       /*
-      官方服務錯誤
+      ========================================
+      HTTP 錯誤
+      ========================================
       */
 
       if (!response.ok) {
 
         throw new Error(
 
-          "官方資料服務回應錯誤：" +
+          "官方資料服務 HTTP " +
 
           response.status
 
@@ -214,18 +568,33 @@ app.get(
 
 
       /*
-      取得 CSV 原始內容
+      ========================================
+      取得官方 CSV
+      ========================================
       */
 
-      const csv =
+      const csvText =
+
         await response.text();
 
 
       /*
-      暫時回傳原始資料
+      ========================================
+      解析官方結果
+      ========================================
+      */
 
-      下一階段我們再把 CSV
-      解析成漂亮的 JSON
+      const officialResult =
+
+        parseOfficialCsv(
+          csvText
+        );
+
+
+      /*
+      ========================================
+      成功回傳
+      ========================================
       */
 
       return res.json({
@@ -234,45 +603,78 @@ app.get(
 
         query: {
 
-          vehicleType: type,
+          vehicleTypeCode:
+            type,
 
-          plateNumber: plate
+          vehicleTypeName:
+            VEHICLE_TYPES[type],
+
+          plateNumber:
+            plate
 
         },
 
-        source:
-          "內政部警政署公開資料服務",
+        officialResult,
+
+        source: {
+
+          name:
+            "內政部警政署公開資料服務",
+
+          description:
+            "車輛竊盜、車牌失竊查詢資料"
+
+        },
 
         queriedAt:
-          new Date().toISOString(),
 
-        rawData:
-          csv
+          new Date()
+            .toISOString()
 
       });
 
-
     }
+
 
     catch (error) {
 
       console.error(
+
         "Vehicle query error:",
+
         error
+
       );
 
 
-      return res.status(500).json({
+      /*
+      ========================================
+      重要：
 
-        success: false,
+      查詢失敗不能回傳
+      「查無失竊資料」
 
-        message:
-          "目前無法完成官方資料查詢",
+      必須明確告訴前端
+      官方資料目前無法確認
+      ========================================
+      */
 
-        error:
-          error.message
+      return res
+        .status(502)
+        .json({
 
-      });
+          success: false,
+
+          code:
+            "OFFICIAL_QUERY_FAILED",
+
+          message:
+            "目前無法完成官方失車資料查詢，請稍後再試",
+
+          detail:
+            error.message
+
+        });
 
     }
 
@@ -283,12 +685,39 @@ app.get(
 
 /*
 ========================================
+404
+========================================
+*/
+
+app.use((req, res) => {
+
+  res
+    .status(404)
+    .json({
+
+      success: false,
+
+      code:
+        "NOT_FOUND",
+
+      message:
+        "找不到此 API 路徑"
+
+    });
+
+});
+
+
+/*
+========================================
 啟動 Server
 ========================================
 */
 
 app.listen(
+
   PORT,
+
   () => {
 
     console.log(
@@ -298,4 +727,5 @@ app.listen(
     );
 
   }
+
 );
