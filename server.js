@@ -1,15 +1,29 @@
 const express = require("express");
 
 const app = express();
-
 const PORT = process.env.PORT || 3000;
+
+/*
+==================================================
+Vehicle Risk Check API
+==================================================
+
+功能：
+1. 警政署公開資料：車輛／號牌失竊查詢
+2. 號牌輸入格式分析
+3. 牌照種類 × 使用者觀察車種的一致性提示
+
+重要：
+- 本系統不會僅憑車牌號碼宣稱某車為「假牌」或「套牌」。
+- 未取得可公開驗證的完整車籍資料時，不推測車主、廠牌、車型、顏色或所有權。
+- 「查無資料」只代表官方公開資料服務在該次查詢回傳查無資料。
+*/
 
 
 /*
-========================================
+==================================================
 CORS
-允許 GitHub Pages 前端呼叫
-========================================
+==================================================
 */
 
 app.use((req, res, next) => {
@@ -35,9 +49,60 @@ app.use((req, res, next) => {
 
 
 /*
-========================================
+==================================================
+牌照種類
+==================================================
+*/
+
+const VEHICLE_TYPES = {
+
+  A: {
+    name: "汽車",
+    group: "car"
+  },
+
+  B: {
+    name: "重機車",
+    group: "motorcycle"
+  },
+
+  C: {
+    name: "輕機車",
+    group: "motorcycle"
+  },
+
+  S: {
+    name: "微電車",
+    group: "micro_ev"
+  },
+
+  T: {
+    name: "拖車",
+    group: "trailer"
+  },
+
+  G: {
+    name: "動力機械車",
+    group: "machinery"
+  },
+
+  TEMP: {
+    name: "臨時牌",
+    group: "temporary"
+  },
+
+  R: {
+    name: "試車牌",
+    group: "test_plate"
+  }
+
+};
+
+
+/*
+==================================================
 首頁 API 狀態
-========================================
+==================================================
 */
 
 app.get("/", (req, res) => {
@@ -53,7 +118,13 @@ app.get("/", (req, res) => {
       "車輛風險查詢 API 正常運作",
 
     version:
-      "1.1.0"
+      "2.0.0",
+
+    modules: [
+      "官方車輛／號牌失竊查詢",
+      "號牌基本格式分析",
+      "車種一致性線索分析"
+    ]
 
   });
 
@@ -61,41 +132,9 @@ app.get("/", (req, res) => {
 
 
 /*
-========================================
-牌照種類
-========================================
-*/
-
-const VEHICLE_TYPES = {
-
-  A: "汽車",
-
-  B: "重機車",
-
-  C: "輕機車",
-
-  S: "微電車",
-
-  T: "拖車",
-
-  G: "動力機械車",
-
-  TEMP: "臨時牌",
-
-  R: "試車牌"
-
-};
-
-
-/*
-========================================
-簡易 CSV 單行解析器
-
-支援：
-一般欄位
-"含逗號的欄位"
-"" 雙引號跳脫
-========================================
+==================================================
+CSV 單行解析器
+==================================================
 */
 
 function parseCsvLine(line) {
@@ -117,11 +156,6 @@ function parseCsvLine(line) {
 
 
     if (char === '"') {
-
-      /*
-      CSV 裡的 ""
-      代表一個雙引號
-      */
 
       if (
         insideQuotes &&
@@ -176,17 +210,12 @@ function parseCsvLine(line) {
 
 
 /*
-========================================
+==================================================
 解析警政署 CSV
-========================================
+==================================================
 */
 
 function parseOfficialCsv(csvText) {
-
-  /*
-  去除 BOM
-  統一換行
-  */
 
   const cleaned =
 
@@ -210,10 +239,6 @@ function parseOfficialCsv(csvText) {
   }
 
 
-  /*
-  移除空白行
-  */
-
   const lines =
 
     cleaned
@@ -226,13 +251,6 @@ function parseOfficialCsv(csvText) {
 
       .filter(Boolean);
 
-
-  /*
-  找 CSV 標題列
-
-  預期：
-  車型,車牌,失車查詢結果,查詢時間
-  */
 
   const headerIndex =
 
@@ -257,10 +275,6 @@ function parseOfficialCsv(csvText) {
 
   }
 
-
-  /*
-  標題下一行才是查詢資料
-  */
 
   const dataLine =
     lines[headerIndex + 1];
@@ -300,21 +314,6 @@ function parseOfficialCsv(csvText) {
   const queryTime =
     values[3];
 
-
-  /*
-  ========================================
-  判定官方結果狀態
-
-  NOT_FOUND：
-  官方本次回傳「查無資料」
-
-  RECORD_FOUND：
-  官方回傳非「查無資料」的失車結果
-
-  注意：
-  RECORD_FOUND 不自行延伸解讀犯罪事實
-  ========================================
-  */
 
   let status;
 
@@ -356,13 +355,318 @@ function parseOfficialCsv(csvText) {
 
 
 /*
-========================================
-車輛失竊／車牌失竊查詢 API
+==================================================
+車牌基本格式分析
+==================================================
+
+這裡只做「輸入結構」檢查。
+
+不把簡化 Regex 當成完整台灣號牌真偽判定規則，
+避免舊式號牌、特殊號牌、不同年代編碼被誤判。
+
+==================================================
+*/
+
+function analyzePlateFormat(plate) {
+
+  const normalized =
+    String(plate || "")
+      .trim()
+      .toUpperCase();
+
+
+  const issues = [];
+
+  const allowedCharacters =
+    /^[A-Z0-9-]+$/;
+
+
+  if (!normalized) {
+
+    issues.push(
+      "未提供車牌號碼"
+    );
+
+  }
+
+
+  if (
+    normalized &&
+    !allowedCharacters.test(
+      normalized
+    )
+  ) {
+
+    issues.push(
+      "包含英文字母、數字及連字號以外的字元"
+    );
+
+  }
+
+
+  if (
+    normalized.startsWith("-") ||
+    normalized.endsWith("-")
+  ) {
+
+    issues.push(
+      "連字號位於車牌號碼開頭或結尾"
+    );
+
+  }
+
+
+  if (
+    normalized.includes("--")
+  ) {
+
+    issues.push(
+      "出現連續連字號"
+    );
+
+  }
+
+
+  const hyphenCount =
+
+    (
+      normalized.match(/-/g) ||
+      []
+    ).length;
+
+
+  if (hyphenCount > 1) {
+
+    issues.push(
+      "出現多個連字號，請確認輸入是否正確"
+    );
+
+  }
+
+
+  const compact =
+
+    normalized.replace(
+      /-/g,
+      ""
+    );
+
+
+  if (
+    compact.length < 2 ||
+    compact.length > 10
+  ) {
+
+    issues.push(
+      "車牌字元長度較不尋常，請再次確認"
+    );
+
+  }
+
+
+  if (
+    compact &&
+    !/[A-Z0-9]/.test(
+      compact
+    )
+  ) {
+
+    issues.push(
+      "未找到有效的英文字母或數字"
+    );
+
+  }
+
+
+  return {
+
+    status:
+      issues.length === 0
+        ? "NO_BASIC_FORMAT_ISSUE"
+        : "CHECK_INPUT",
+
+    normalizedPlate:
+      normalized,
+
+    basicFormatValid:
+      issues.length === 0,
+
+    issues,
+
+    message:
+      issues.length === 0
+
+        ? "未發現基本輸入格式異常。此結果僅代表字元與基本結構可被系統正常辨識，不代表號牌真偽或車籍狀態已獲官方驗證。"
+
+        : "輸入格式有需要再次確認的地方。這不代表該號牌為偽造或套牌。"
+
+  };
+
+}
+
+
+/*
+==================================================
+車種一致性線索分析
+==================================================
+
+使用者可選填 observedVehicle：
+passenger
+suv
+van
+truck
+motorcycle
+other
+
+本模組只檢查「明顯類別矛盾」。
+
+例如：
+使用者選擇牌照種類 = 重機車
+但實際看到的車 = 小客車
+
+這是輸入／觀察資訊矛盾，
+不是「套牌判定」。
+
+==================================================
+*/
+
+function analyzeObservedConsistency(
+  vehicleTypeCode,
+  observedVehicle
+) {
+
+  const typeInfo =
+    VEHICLE_TYPES[
+      vehicleTypeCode
+    ];
+
+
+  if (!observedVehicle) {
+
+    return {
+
+      status:
+        "NOT_CHECKED",
+
+      hasConflict:
+        false,
+
+      message:
+        "未提供實際觀察車種，因此未進行車種一致性線索分析。"
+
+    };
+
+  }
+
+
+  const observedCarGroups = [
+    "passenger",
+    "suv",
+    "van",
+    "truck"
+  ];
+
+
+  const observedIsCar =
+
+    observedCarGroups.includes(
+      observedVehicle
+    );
+
+
+  const observedIsMotorcycle =
+
+    observedVehicle ===
+    "motorcycle";
+
+
+  let hasConflict =
+    false;
+
+
+  let reason =
+    "";
+
+
+  if (
+    typeInfo.group === "car" &&
+    observedIsMotorcycle
+  ) {
+
+    hasConflict =
+      true;
+
+    reason =
+      "查詢時選擇的牌照種類為汽車，但實際觀察車種填寫為機車。";
+
+  }
+
+
+  else if (
+    (
+      typeInfo.group === "motorcycle" ||
+      typeInfo.group === "micro_ev"
+    ) &&
+    observedIsCar
+  ) {
+
+    hasConflict =
+      true;
+
+    reason =
+      "查詢時選擇的牌照種類屬機車／微型電動二輪車，但實際觀察車種填寫為汽車類。";
+
+  }
+
+
+  if (hasConflict) {
+
+    return {
+
+      status:
+        "OBSERVATION_CONFLICT",
+
+      hasConflict:
+        true,
+
+      reason,
+
+      message:
+        "牌照種類與使用者填寫的實際觀察車種存在明顯類別矛盾。請先確認輸入是否正確；此結果不能單獨用來判定套牌、假牌或犯罪事實。"
+
+    };
+
+  }
+
+
+  return {
+
+    status:
+      "NO_OBVIOUS_CONFLICT",
+
+    hasConflict:
+      false,
+
+    message:
+      "依目前提供的牌照種類與實際觀察車種，未發現明顯的基本類別矛盾。此結果不等同官方車籍比對。"
+
+  };
+
+}
+
+
+/*
+==================================================
+車輛失竊／號牌失竊查詢 API
 
 範例：
 
 /api/vehicle?type=A&plate=AXW-3000
-========================================
+
+可選填：
+&observedVehicle=passenger
+
+==================================================
 */
 
 app.get(
@@ -373,9 +677,9 @@ app.get(
     try {
 
       /*
-      ========================================
-      取得查詢參數
-      ========================================
+      ==============================================
+      取得參數
+      ==============================================
       */
 
       const type =
@@ -402,10 +706,22 @@ app.get(
           .replace(/\s+/g, "");
 
 
+      const observedVehicle =
+
+        String(
+          req.query.observedVehicle ||
+          ""
+        )
+
+          .trim()
+
+          .toLowerCase();
+
+
       /*
-      ========================================
+      ==============================================
       基本驗證
-      ========================================
+      ==============================================
       */
 
       if (!type || !plate) {
@@ -453,15 +769,8 @@ app.get(
       }
 
 
-      /*
-      車牌只允許基本合理字元
-
-      不在這裡過度限制格式，
-      因為不同牌照種類格式不同。
-      */
-
       if (
-        !/^[A-Z0-9\-]+$/.test(
+        !/^[A-Z0-9-]+$/.test(
           plate
         )
       ) {
@@ -473,10 +782,10 @@ app.get(
             success: false,
 
             code:
-              "INVALID_PLATE_FORMAT",
+              "INVALID_PLATE_CHARACTERS",
 
             message:
-              "車牌號碼格式不正確"
+              "車牌號碼包含不支援的字元"
 
           });
 
@@ -484,9 +793,30 @@ app.get(
 
 
       /*
-      ========================================
-      建立官方查詢參數
-      ========================================
+      ==============================================
+      本地分析
+      ==============================================
+      */
+
+      const plateAnalysis =
+
+        analyzePlateFormat(
+          plate
+        );
+
+
+      const consistencyAnalysis =
+
+        analyzeObservedConsistency(
+          type,
+          observedVehicle
+        );
+
+
+      /*
+      ==============================================
+      建立警政署官方查詢
+      ==============================================
       */
 
       const params =
@@ -512,9 +842,9 @@ app.get(
 
 
       /*
-      ========================================
-      呼叫警政署公開資料服務
-      ========================================
+      ==============================================
+      呼叫官方公開資料服務
+      ==============================================
       */
 
       const response =
@@ -531,7 +861,7 @@ app.get(
             headers: {
 
               "User-Agent":
-                "Vehicle-Risk-Check/1.1",
+                "Vehicle-Risk-Check/2.0",
 
               "Accept":
                 "text/csv,text/plain,*/*"
@@ -548,12 +878,6 @@ app.get(
         );
 
 
-      /*
-      ========================================
-      HTTP 錯誤
-      ========================================
-      */
-
       if (!response.ok) {
 
         throw new Error(
@@ -567,22 +891,10 @@ app.get(
       }
 
 
-      /*
-      ========================================
-      取得官方 CSV
-      ========================================
-      */
-
       const csvText =
 
         await response.text();
 
-
-      /*
-      ========================================
-      解析官方結果
-      ========================================
-      */
 
       const officialResult =
 
@@ -592,9 +904,60 @@ app.get(
 
 
       /*
-      ========================================
-      成功回傳
-      ========================================
+      ==============================================
+      綜合狀態
+
+      注意：
+      這不是「犯罪風險分數」。
+
+      HIGH_ATTENTION：
+      官方失車資料有紀錄
+
+      REVIEW_INPUT：
+      官方查無失車資料，
+      但輸入格式或觀察資訊有矛盾
+
+      NO_FLAG_FOUND：
+      官方查無失車資料，
+      且本地基本檢查未發現明顯矛盾
+      ==============================================
+      */
+
+      let overallStatus;
+
+
+      if (
+        officialResult.status ===
+        "RECORD_FOUND"
+      ) {
+
+        overallStatus =
+          "HIGH_ATTENTION";
+
+      }
+
+      else if (
+        !plateAnalysis.basicFormatValid ||
+        consistencyAnalysis.hasConflict
+      ) {
+
+        overallStatus =
+          "REVIEW_INPUT";
+
+      }
+
+      else {
+
+        overallStatus =
+          "NO_FLAG_FOUND";
+
+      }
+
+
+      /*
+      ==============================================
+      回傳
+      ==============================================
       */
 
       return res.json({
@@ -607,12 +970,51 @@ app.get(
             type,
 
           vehicleTypeName:
-            VEHICLE_TYPES[type],
+            VEHICLE_TYPES[type].name,
 
           plateNumber:
-            plate
+            plate,
+
+          observedVehicle:
+            observedVehicle ||
+            null
 
         },
+
+        officialStolenVehicleCheck: {
+
+          ...officialResult,
+
+          source: {
+
+            name:
+              "內政部警政署公開資料服務",
+
+            description:
+              "車輛竊盜、車牌失竊查詢資料"
+
+          }
+
+        },
+
+        plateAnalysis,
+
+        consistencyAnalysis,
+
+        overall: {
+
+          status:
+            overallStatus,
+
+          disclaimer:
+            "本結果整合官方失車公開資料與基本輸入／觀察一致性檢查。除官方失車查詢結果外，其餘分析不等同官方車籍驗證，也不能單獨用來判定假牌、套牌、所有權或犯罪事實。"
+
+        },
+
+        /*
+        保留舊版欄位，
+        避免目前 index.html 立即壞掉。
+        */
 
         officialResult,
 
@@ -648,15 +1050,7 @@ app.get(
 
 
       /*
-      ========================================
-      重要：
-
-      查詢失敗不能回傳
-      「查無失竊資料」
-
-      必須明確告訴前端
-      官方資料目前無法確認
-      ========================================
+      查詢失敗絕不能當成查無資料
       */
 
       return res
@@ -684,9 +1078,9 @@ app.get(
 
 
 /*
-========================================
+==================================================
 404
-========================================
+==================================================
 */
 
 app.use((req, res) => {
@@ -709,9 +1103,9 @@ app.use((req, res) => {
 
 
 /*
-========================================
+==================================================
 啟動 Server
-========================================
+==================================================
 */
 
 app.listen(
@@ -722,7 +1116,7 @@ app.listen(
 
     console.log(
 
-      `Vehicle Risk API running on port ${PORT}`
+      `Vehicle Risk API v2.0 running on port ${PORT}`
 
     );
 
