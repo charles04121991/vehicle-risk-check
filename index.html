@@ -3,25 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>車輛風險查詢平台</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        "Noto Sans TC",
-        Arial,
-        sans-serif;
-
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", Arial, sans-serif;
       background: #f4f6f8;
       color: #1f2937;
       min-height: 100vh;
@@ -36,21 +24,13 @@
     .header-inner {
       max-width: 900px;
       margin: auto;
-
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .brand {
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .header-sub {
-      color: #9ca3af;
-      font-size: 13px;
-    }
+    .brand { font-size: 20px; font-weight: 800; }
+    .header-sub { color: #9ca3af; font-size: 13px; }
 
     main {
       max-width: 900px;
@@ -63,33 +43,21 @@
       margin-bottom: 35px;
     }
 
-    .hero-icon {
-      font-size: 50px;
-      margin-bottom: 12px;
-    }
-
-    .hero h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
-    }
+    .hero-icon { font-size: 50px; margin-bottom: 12px; }
+    .hero h1 { font-size: 32px; margin-bottom: 10px; }
 
     .hero p {
       color: #6b7280;
       line-height: 1.7;
     }
 
-    .search-card {
+    .search-card, .result {
       max-width: 650px;
       margin: auto;
-
       background: white;
-
       padding: 30px;
-
       border-radius: 18px;
-
-      box-shadow:
-        0 8px 30px rgba(0, 0, 0, 0.07);
+      box-shadow: 0 8px 30px rgba(0,0,0,.07);
     }
 
     .section-title {
@@ -98,78 +66,69 @@
       margin-bottom: 22px;
     }
 
-    .form-group {
-      margin-bottom: 20px;
-    }
+    .form-group { margin-bottom: 20px; }
 
     label {
       display: block;
-
       font-size: 14px;
       font-weight: 700;
-
       margin-bottom: 8px;
     }
 
-    select,
-    input {
+    select, input {
       width: 100%;
-
       padding: 15px;
-
       border: 2px solid #d1d5db;
       border-radius: 10px;
-
       background: white;
-
       font-size: 16px;
-
       outline: none;
     }
 
-    select:focus,
-    input:focus {
-      border-color: #111827;
-    }
+    select:focus, input:focus { border-color: #111827; }
 
     #plateInput {
       font-size: 22px;
       font-weight: 700;
-
       letter-spacing: 2px;
-
       text-transform: uppercase;
     }
 
     .helper {
       margin-top: 7px;
-
       color: #9ca3af;
-
       font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .advanced {
+      margin: 24px 0;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .advanced-title {
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .advanced-sub {
+      color: #6b7280;
+      font-size: 12px;
+      margin-bottom: 18px;
     }
 
     .search-button {
       width: 100%;
-
       padding: 16px;
-
       border: none;
       border-radius: 10px;
-
       background: #111827;
       color: white;
-
       font-size: 16px;
       font-weight: 800;
-
       cursor: pointer;
-
-      transition: 0.2s;
-    }
-
-    .search-button:hover {
-      background: #374151;
     }
 
     .search-button:disabled {
@@ -180,432 +139,196 @@
     .source-info {
       max-width: 650px;
       margin: 18px auto 0;
-
       padding: 14px 16px;
-
       background: #eef2ff;
-
       border-radius: 10px;
-
       color: #4338ca;
-
       font-size: 12px;
       line-height: 1.7;
     }
 
-    /*
-    ==============================
-    查詢結果
-    ==============================
-    */
-
     .result {
       display: none;
-
-      max-width: 650px;
-
-      margin: 25px auto 0;
-
-      background: white;
-
-      border-radius: 18px;
-
-      box-shadow:
-        0 8px 30px rgba(0, 0, 0, 0.07);
-
+      margin-top: 25px;
+      padding: 0;
       overflow: hidden;
     }
 
     .result-top {
       padding: 25px;
-
       border-bottom: 1px solid #e5e7eb;
     }
 
     .vehicle-type-label {
       color: #6b7280;
       font-size: 13px;
-
       margin-bottom: 5px;
     }
 
     .result-plate {
       font-size: 30px;
       font-weight: 900;
-
       letter-spacing: 2px;
     }
 
     .query-time {
       margin-top: 7px;
-
       color: #9ca3af;
-
       font-size: 12px;
     }
 
-    .result-content {
-      padding: 25px;
-    }
+    .result-content { padding: 25px; }
 
-    /*
-    ==============================
-    官方結果主卡片
-    ==============================
-    */
-
-    .official-result {
-      padding: 22px;
-
+    .check-card {
+      padding: 20px;
       border-radius: 14px;
-
-      margin-bottom: 20px;
-    }
-
-    .official-result.loading {
-      background: #f3f4f6;
+      margin-bottom: 15px;
       border: 1px solid #e5e7eb;
+      background: #f9fafb;
     }
 
-    .official-result.safe {
+    .check-card.safe {
       background: #ecfdf5;
-      border: 1px solid #a7f3d0;
+      border-color: #a7f3d0;
     }
 
-    .official-result.danger {
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-    }
-
-    .official-result.error {
+    .check-card.warning {
       background: #fffbeb;
-      border: 1px solid #fde68a;
+      border-color: #fde68a;
     }
 
-    .result-status {
-      font-size: 21px;
+    .check-card.danger {
+      background: #fef2f2;
+      border-color: #fecaca;
+    }
+
+    .check-card.loading {
+      background: #f3f4f6;
+    }
+
+    .check-title {
+      font-size: 17px;
       font-weight: 900;
-
-      margin-bottom: 9px;
+      margin-bottom: 8px;
     }
 
-    .result-description {
+    .check-description {
+      color: #4b5563;
       font-size: 13px;
       line-height: 1.7;
-      color: #4b5563;
     }
 
-    /*
-    ==============================
-    詳細資料
-    ==============================
-    */
-
     .details {
-      border-top: 1px solid #e5e7eb;
-      margin-top: 20px;
-      padding-top: 10px;
+      margin-top: 15px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(0,0,0,.08);
     }
 
     .detail-row {
       display: flex;
-
       justify-content: space-between;
-
       gap: 20px;
-
-      padding: 12px 0;
-
-      border-bottom: 1px solid #f3f4f6;
-
+      padding: 10px 0;
       font-size: 13px;
     }
 
-    .detail-label {
-      color: #6b7280;
+    .detail-label { color: #6b7280; }
+    .detail-value { font-weight: 700; text-align: right; }
+
+    .summary {
+      margin-top: 20px;
+      padding: 20px;
+      background: #111827;
+      color: white;
+      border-radius: 14px;
     }
 
-    .detail-value {
-      text-align: right;
-      font-weight: 700;
-
-      word-break: break-word;
+    .summary-title {
+      font-size: 13px;
+      color: #d1d5db;
+      margin-bottom: 7px;
     }
 
-    /*
-    ==============================
-    其他平台資料
-    ==============================
-    */
-
-    .data-row {
-      display: flex;
-
-      justify-content: space-between;
-      align-items: center;
-
-      gap: 15px;
-
-      padding: 17px 0;
-
-      border-bottom: 1px solid #f3f4f6;
+    .summary-result {
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1.5;
     }
-
-    .data-name {
-      font-weight: 700;
-    }
-
-    .data-description {
-      margin-top: 4px;
-
-      color: #6b7280;
-
-      font-size: 12px;
-    }
-
-    .badge {
-      flex-shrink: 0;
-
-      padding: 6px 11px;
-
-      border-radius: 20px;
-
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .badge-safe {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .badge-pending {
-      background: #f3f4f6;
-      color: #4b5563;
-    }
-
-    /*
-    ==============================
-    注意事項
-    ==============================
-    */
 
     .notice-box {
       margin-top: 20px;
-
       padding: 18px;
-
       background: #f9fafb;
-
       border-radius: 12px;
-
       color: #6b7280;
-
       font-size: 12px;
       line-height: 1.8;
-    }
-
-    /*
-    ==============================
-    功能區
-    ==============================
-    */
-
-    .features {
-      max-width: 650px;
-
-      margin: 40px auto 0;
-
-      display: grid;
-
-      grid-template-columns:
-        repeat(3, 1fr);
-
-      gap: 15px;
-    }
-
-    .feature {
-      background: white;
-
-      padding: 20px;
-
-      border-radius: 14px;
-
-      text-align: center;
-
-      box-shadow:
-        0 4px 18px rgba(0, 0, 0, 0.05);
-    }
-
-    .feature-icon {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .feature-title {
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .feature-description {
-      margin-top: 5px;
-
-      color: #6b7280;
-
-      font-size: 12px;
-      line-height: 1.5;
     }
 
     footer {
       padding: 40px 20px;
-
       text-align: center;
-
       color: #9ca3af;
-
       font-size: 12px;
-
       line-height: 1.8;
     }
 
     @media (max-width: 650px) {
-
-      main {
-        padding-top: 35px;
-      }
-
-      .hero h1 {
-        font-size: 26px;
-      }
-
-      .search-card {
-        padding: 22px;
-      }
-
-      .features {
-        grid-template-columns: 1fr;
-      }
-
-      .header-sub {
-        display: none;
-      }
+      main { padding-top: 35px; }
+      .hero h1 { font-size: 26px; }
+      .search-card { padding: 22px; }
+      .header-sub { display: none; }
 
       .detail-row {
         flex-direction: column;
-        gap: 5px;
+        gap: 4px;
       }
 
-      .detail-value {
-        text-align: left;
-      }
-
+      .detail-value { text-align: left; }
     }
-
   </style>
 </head>
 
-
 <body>
 
-
 <header>
-
   <div class="header-inner">
-
-    <div class="brand">
-      🚘 車輛風險查詢
-    </div>
-
-    <div class="header-sub">
-      Vehicle Risk Check
-    </div>
-
+    <div class="brand">🚘 車輛風險查詢</div>
+    <div class="header-sub">Vehicle Risk Check</div>
   </div>
-
 </header>
-
 
 <main>
 
-
   <section class="hero">
-
-    <div class="hero-icon">
-      🔎
-    </div>
-
-    <h1>
-      車輛風險查詢平台
-    </h1>
-
+    <div class="hero-icon">🔎</div>
+    <h1>車輛快速查詢</h1>
     <p>
-      輸入牌照種類與車牌號碼<br>
-      查詢車輛／號牌失竊公開資訊
+      輸入牌照種類與車牌號碼，一次查看官方失車資料<br>
+      並進行基本車牌格式與異常線索檢查
     </p>
-
   </section>
-
-
-  <!-- 查詢 -->
 
   <section class="search-card">
 
-    <div class="section-title">
-      車牌快速查詢
-    </div>
-
+    <div class="section-title">車牌快速查詢</div>
 
     <div class="form-group">
-
-      <label for="vehicleType">
-        牌照種類
-      </label>
-
+      <label for="vehicleType">牌照種類</label>
       <select id="vehicleType">
-
-        <option value="A">
-          汽車
-        </option>
-
-        <option value="B">
-          重型機車
-        </option>
-
-        <option value="C">
-          輕型機車
-        </option>
-
-        <option value="S">
-          微型電動二輪車
-        </option>
-
-        <option value="T">
-          拖車
-        </option>
-
-        <option value="G">
-          動力機械車
-        </option>
-
-        <option value="TEMP">
-          臨時牌
-        </option>
-
-        <option value="R">
-          試車牌
-        </option>
-
+        <option value="A">汽車</option>
+        <option value="B">重型機車</option>
+        <option value="C">輕型機車</option>
+        <option value="S">微型電動二輪車</option>
+        <option value="T">拖車</option>
+        <option value="G">動力機械車</option>
+        <option value="TEMP">臨時牌</option>
+        <option value="R">試車牌</option>
       </select>
-
     </div>
 
-
     <div class="form-group">
-
-      <label for="plateInput">
-        車牌號碼
-      </label>
-
+      <label for="plateInput">車牌號碼</label>
       <input
         id="plateInput"
         type="text"
@@ -613,886 +336,572 @@
         maxlength="15"
         autocomplete="off"
       >
-
       <div class="helper">
-        請依車牌實際內容輸入完整號碼
+        請依車牌實際內容輸入完整號碼。
+      </div>
+    </div>
+
+    <div class="advanced">
+
+      <div class="advanced-title">進階異常線索檢查（選填）</div>
+
+      <div class="advanced-sub">
+        這些欄位用於整理你實際看到的車輛特徵，不會單憑選項判定車輛為假牌或套牌。
+      </div>
+
+      <div class="form-group">
+        <label for="observedVehicle">實際看到的車輛類型</label>
+        <select id="observedVehicle">
+          <option value="">不指定</option>
+          <option value="passenger">小客車／轎車</option>
+          <option value="suv">休旅車</option>
+          <option value="van">廂型車／小貨車</option>
+          <option value="truck">貨車</option>
+          <option value="motorcycle">機車</option>
+          <option value="other">其他</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="plateAppearance">實際看到的號牌外觀</label>
+        <select id="plateAppearance">
+          <option value="">不指定</option>
+          <option value="white-black">白底深色字</option>
+          <option value="other">其他外觀／不確定</option>
+        </select>
       </div>
 
     </div>
-
 
     <button
       id="searchButton"
       class="search-button"
       onclick="searchVehicle()"
     >
-      🔎 立即查詢
+      🔎 一鍵查詢
     </button>
 
   </section>
 
-
   <div class="source-info">
-
-    🛡️ 車輛／號牌失竊查詢資料來源：
-    內政部警政署公開資料服務。
-
-    查詢結果會依官方資料現況更新。
-
+    🛡️ 車輛／號牌失竊資料透過後端連接內政部警政署公開資料服務。
+    車牌格式及異常線索功能僅作輔助檢查，不等同官方車籍驗證，也不能據此判定偽造、套牌或犯罪事實。
   </div>
 
-
-  <!-- 查詢結果 -->
-
-  <section
-    id="result"
-    class="result"
-  >
+  <section id="result" class="result">
 
     <div class="result-top">
-
-      <div
-        id="resultVehicleType"
-        class="vehicle-type-label"
-      >
-      </div>
-
-      <div
-        id="resultPlate"
-        class="result-plate"
-      >
-      </div>
-
-      <div
-        id="localQueryTime"
-        class="query-time"
-      >
-      </div>
-
+      <div id="resultVehicleType" class="vehicle-type-label"></div>
+      <div id="resultPlate" class="result-plate"></div>
+      <div id="localQueryTime" class="query-time"></div>
     </div>
-
 
     <div class="result-content">
 
-
-      <!-- 官方查詢結果 -->
-
-      <div
-        id="officialResult"
-        class="official-result loading"
-      >
-
-        <div
-          id="resultStatus"
-          class="result-status"
-        >
-          🔄 正在查詢官方資料...
+      <div id="officialCard" class="check-card loading">
+        <div id="officialTitle" class="check-title">
+          🔄 正在查詢官方失車資料...
         </div>
 
-        <div
-          id="resultDescription"
-          class="result-description"
-        >
-          正在連線至車輛失竊公開資料服務，
-          請稍候。
+        <div id="officialDescription" class="check-description">
+          正在連線至官方公開資料服務。
         </div>
 
-
-        <div
-          id="officialDetails"
-          class="details"
-          style="display:none;"
-        >
+        <div id="officialDetails" class="details" style="display:none;">
+          <div class="detail-row">
+            <div class="detail-label">官方查詢結果</div>
+            <div id="officialResultText" class="detail-value"></div>
+          </div>
 
           <div class="detail-row">
-
-            <div class="detail-label">
-              官方查詢結果
-            </div>
-
-            <div
-              id="officialResultText"
-              class="detail-value"
-            >
-            </div>
-
+            <div class="detail-label">官方查詢時間</div>
+            <div id="officialQueryTime" class="detail-value"></div>
           </div>
-
 
           <div class="detail-row">
-
-            <div class="detail-label">
-              官方查詢時間
-            </div>
-
-            <div
-              id="officialQueryTime"
-              class="detail-value"
-            >
-            </div>
-
+            <div class="detail-label">資料來源</div>
+            <div id="officialSource" class="detail-value"></div>
           </div>
-
-
-          <div class="detail-row">
-
-            <div class="detail-label">
-              資料來源
-            </div>
-
-            <div
-              id="officialSource"
-              class="detail-value"
-            >
-              內政部警政署公開資料服務
-            </div>
-
-          </div>
-
         </div>
-
       </div>
 
-
-      <!-- 未來平台協尋 -->
-
-      <div class="data-row">
-
-        <div>
-
-          <div class="data-name">
-            📢 平台協尋紀錄
-          </div>
-
-          <div class="data-description">
-            本平台建立之車輛協尋資料
-          </div>
-
+      <div id="formatCard" class="check-card">
+        <div id="formatTitle" class="check-title">
+          🔍 車牌格式檢查
         </div>
 
-        <div class="badge badge-pending">
-          尚未啟用
+        <div id="formatDescription" class="check-description">
+          等待查詢。
         </div>
-
       </div>
 
-
-      <!-- 未來異常通報 -->
-
-      <div class="data-row">
-
-        <div>
-
-          <div class="data-name">
-            ⚠️ 異常車輛通報
-          </div>
-
-          <div class="data-description">
-            疑似套牌、號牌異常及其他通報
-          </div>
-
+      <div id="consistencyCard" class="check-card">
+        <div id="consistencyTitle" class="check-title">
+          ⚠️ 車種／號牌異常線索
         </div>
 
-        <div class="badge badge-pending">
-          尚未啟用
+        <div id="consistencyDescription" class="check-description">
+          等待查詢。
         </div>
-
       </div>
 
-
-      <!-- 注意事項 -->
+      <div class="summary">
+        <div class="summary-title">綜合查詢結果</div>
+        <div id="summaryResult" class="summary-result">
+          等待查詢
+        </div>
+      </div>
 
       <div class="notice-box">
+        <strong>重要說明</strong><br><br>
 
-        <strong>
-          查詢結果說明
-        </strong>
+        「查無資料」僅表示官方公開資料服務於該次查詢回傳查無相關失車資料，
+        不代表車輛合法性、所有權、車籍狀態或號牌真偽已獲確認。<br><br>
 
-        <br><br>
+        本網站目前無法僅憑車牌號碼自動取得完整車籍資料，因此「異常線索檢查」
+        不會把任何車輛直接標示為「假車牌」或「套牌車」。<br><br>
 
-        「查無資料」僅表示官方公開資料服務於本次查詢時回傳查無相關失車資料，
-        不代表本平台對車輛合法性、所有權或安全狀態作出保證。
-
-        <br><br>
-
-        如發現疑似失竊、套牌、偽造或變造號牌等可疑車輛，
-        請勿自行攔截、追蹤或與駕駛發生衝突，
-        應聯絡警方確認及處理。
-
+        如發現疑似失竊、偽造或變造號牌、套牌等可疑情況，
+        請勿自行攔截、追蹤或與駕駛發生衝突，應由警方或主管機關進一步確認。
       </div>
 
     </div>
-
   </section>
-
-
-  <!-- 未來功能 -->
-
-  <section class="features">
-
-    <div class="feature">
-
-      <div class="feature-icon">
-        🚨
-      </div>
-
-      <div class="feature-title">
-        失竊／協尋
-      </div>
-
-      <div class="feature-description">
-        查詢失竊及公開協尋資訊
-      </div>
-
-    </div>
-
-
-    <div class="feature">
-
-      <div class="feature-icon">
-        ⚠️
-      </div>
-
-      <div class="feature-title">
-        異常車輛通報
-      </div>
-
-      <div class="feature-description">
-        通報疑似套牌或其他異常
-      </div>
-
-    </div>
-
-
-    <div class="feature">
-
-      <div class="feature-icon">
-        📢
-      </div>
-
-      <div class="feature-title">
-        車輛協尋中心
-      </div>
-
-      <div class="feature-description">
-        查看經審核之公開協尋案件
-      </div>
-
-    </div>
-
-  </section>
-
 
 </main>
 
-
 <footer>
-
-  車輛風險查詢平台
-
-  <br>
-
-  本平台非政府機關或執法單位，
-  官方資料應以主管機關最新資訊為準。
-
+  車輛風險查詢平台<br>
+  本平台非政府機關或執法單位，官方資料應以主管機關最新資訊為準。
 </footer>
 
-
 <script>
-
-  /*
-  ========================================
-  我們自己的 Render API
-  ========================================
-  */
 
   const API_BASE_URL =
     "https://vehicle-risk-check.onrender.com";
 
-
-  /*
-  ========================================
-  整理車牌
-  ========================================
-  */
-
   function normalizePlate(value) {
-
     return String(value || "")
-
       .trim()
-
       .toUpperCase()
-
       .replace(/\s+/g, "");
-
   }
-
-
-  /*
-  ========================================
-  HTML 安全文字
-  ========================================
-  */
 
   function setText(id, value) {
-
-    document.getElementById(
-      id
-    ).textContent =
-      value || "";
-
+    document.getElementById(id).textContent = value || "";
   }
 
+  function setCard(id, state) {
+    document.getElementById(id).className =
+      "check-card " + state;
+  }
 
-  /*
-  ========================================
-  顯示 Loading
-  ========================================
-  */
+  function checkPlateFormat(plate) {
 
-  function showLoading() {
+    const allowed =
+      /^[A-Z0-9\-]+$/.test(plate);
 
-    const box =
-      document.getElementById(
-        "officialResult"
+    const hasContent =
+      /[A-Z0-9]/.test(plate);
+
+    const noDoubleHyphen =
+      !plate.includes("--");
+
+    const reasonableLength =
+      plate.length >= 3 &&
+      plate.length <= 15;
+
+    if (
+      allowed &&
+      hasContent &&
+      noDoubleHyphen &&
+      reasonableLength
+    ) {
+      return {
+        ok: true,
+        message:
+          "未發現基本輸入格式異常。此檢查只確認字元與基本結構，不代表號牌已經官方驗證。"
+      };
+    }
+
+    return {
+      ok: false,
+      message:
+        "輸入的車牌格式存在異常，請確認是否有輸入錯誤、特殊符號或不合理的連字號。"
+    };
+  }
+
+  function checkObservedConsistency(
+    vehicleType,
+    observedVehicle,
+    plateAppearance
+  ) {
+
+    if (!observedVehicle && !plateAppearance) {
+      return {
+        state: "warning",
+        title: "⚪ 未進行進階異常線索檢查",
+        message:
+          "你沒有填寫實際看到的車輛類型或號牌外觀，因此本次不進行外觀一致性提示。"
+      };
+    }
+
+    const motorcycleObserved =
+      observedVehicle === "motorcycle";
+
+    const motorcycleSelected =
+      vehicleType === "B" ||
+      vehicleType === "C" ||
+      vehicleType === "S";
+
+    if (
+      observedVehicle &&
+      motorcycleObserved !== motorcycleSelected
+    ) {
+      return {
+        state: "warning",
+        title: "🟠 發現需要再次確認的車種線索",
+        message:
+          "你選擇的牌照種類與實際看到的車輛類型可能不一致。這只代表輸入資料之間存在矛盾，不能據此判定為套牌或假牌，建議先確認是否選錯牌照種類。"
+      };
+    }
+
+    return {
+      state: "safe",
+      title: "🟢 未發現明顯的輸入資料矛盾",
+      message:
+        "目前依你提供的牌照種類與實際觀察資訊，未發現明顯的基本矛盾。此結果不等同官方車籍或號牌真偽驗證。"
+    };
+  }
+
+  function updateSummary(
+    officialStatus,
+    formatOk,
+    consistencyState
+  ) {
+
+    if (officialStatus === "RECORD_FOUND") {
+      setText(
+        "summaryResult",
+        "🚨 官方失車查詢出現相關資料，請依官方結果處理並由警方進一步確認。"
       );
+      return;
+    }
 
-    box.className =
-      "official-result loading";
-
-
-    setText(
-      "resultStatus",
-      "🔄 正在查詢官方資料..."
-    );
-
-
-    setText(
-      "resultDescription",
-      "正在連線至車輛失竊公開資料服務，請稍候。"
-    );
-
-
-    document.getElementById(
-      "officialDetails"
-    ).style.display =
-      "none";
-
-  }
-
-
-  /*
-  ========================================
-  官方查無資料
-  ========================================
-  */
-
-  function showNotFound(data) {
-
-    const box =
-      document.getElementById(
-        "officialResult"
+    if (officialStatus === "ERROR") {
+      setText(
+        "summaryResult",
+        "⚠️ 官方失車資料未能完成查詢，本次無法產生完整結論。"
       );
+      return;
+    }
 
-    box.className =
-      "official-result safe";
-
-
-    setText(
-      "resultStatus",
-      "🟢 本次官方查詢：查無資料"
-    );
-
-
-    setText(
-      "resultDescription",
-      "警政署公開資料服務於本次查詢回傳「查無資料」。"
-    );
-
-
-    setText(
-      "officialResultText",
-      data.officialResult.resultText
-    );
-
-
-    setText(
-      "officialQueryTime",
-      data.officialResult.queryTime
-    );
-
-
-    setText(
-      "officialSource",
-      data.source.name
-    );
-
-
-    document.getElementById(
-      "officialDetails"
-    ).style.display =
-      "block";
-
-  }
-
-
-  /*
-  ========================================
-  官方查有相關紀錄
-  ========================================
-  */
-
-  function showRecordFound(data) {
-
-    const box =
-      document.getElementById(
-        "officialResult"
+    if (!formatOk) {
+      setText(
+        "summaryResult",
+        "🟠 官方本次未顯示失車資料，但輸入的車牌格式需要再次確認。"
       );
+      return;
+    }
 
-    box.className =
-      "official-result danger";
-
-
-    setText(
-      "resultStatus",
-      "🚨 查有失車相關資料"
-    );
-
-
-    setText(
-      "resultDescription",
-      "官方公開資料服務回傳失車相關查詢結果。請勿自行攔截、追蹤或接觸車輛，如有需要請聯絡警方確認。"
-    );
-
-
-    setText(
-      "officialResultText",
-      data.officialResult.resultText
-    );
-
-
-    setText(
-      "officialQueryTime",
-      data.officialResult.queryTime
-    );
-
-
-    setText(
-      "officialSource",
-      data.source.name
-    );
-
-
-    document.getElementById(
-      "officialDetails"
-    ).style.display =
-      "block";
-
-  }
-
-
-  /*
-  ========================================
-  查詢失敗
-  ========================================
-  */
-
-  function showError(message) {
-
-    const box =
-      document.getElementById(
-        "officialResult"
+    if (consistencyState === "warning") {
+      setText(
+        "summaryResult",
+        "🟠 官方本次未顯示失車資料，但你提供的部分觀察資訊需要再次確認。"
       );
-
-    box.className =
-      "official-result error";
-
+      return;
+    }
 
     setText(
-      "resultStatus",
-      "⚠️ 官方資料目前無法確認"
+      "summaryResult",
+      "🟢 官方本次查無失車資料，且目前未發現基本輸入格式或觀察資料的明顯矛盾。"
     );
-
-
-    setText(
-      "resultDescription",
-      message ||
-      "本次官方資料查詢未成功完成，請稍後重新查詢。"
-    );
-
-
-    document.getElementById(
-      "officialDetails"
-    ).style.display =
-      "none";
-
   }
-
-
-  /*
-  ========================================
-  主查詢功能
-  ========================================
-  */
 
   async function searchVehicle() {
 
     const typeSelect =
-      document.getElementById(
-        "vehicleType"
-      );
+      document.getElementById("vehicleType");
 
     const plateInput =
-      document.getElementById(
-        "plateInput"
-      );
+      document.getElementById("plateInput");
+
+    const observedVehicle =
+      document.getElementById("observedVehicle").value;
+
+    const plateAppearance =
+      document.getElementById("plateAppearance").value;
 
     const button =
-      document.getElementById(
-        "searchButton"
-      );
-
+      document.getElementById("searchButton");
 
     const type =
       typeSelect.value;
 
-
     const typeName =
-
       typeSelect.options[
         typeSelect.selectedIndex
       ].text.trim();
 
-
     const plate =
-      normalizePlate(
-        plateInput.value
-      );
-
-
-    /*
-    未輸入
-    */
+      normalizePlate(plateInput.value);
 
     if (!plate) {
-
-      alert(
-        "請輸入車牌號碼"
-      );
-
+      alert("請輸入車牌號碼");
       plateInput.focus();
-
       return;
-
     }
-
-
-    /*
-    基本格式
-    */
-
-    if (
-      !/^[A-Z0-9\-]+$/.test(
-        plate
-      )
-    ) {
-
-      alert(
-        "車牌號碼只能包含英文字母、數字及連字號"
-      );
-
-      plateInput.focus();
-
-      return;
-
-    }
-
-
-    /*
-    顯示查詢區
-    */
 
     setText(
       "resultVehicleType",
       "牌照種類：" + typeName
     );
 
-
     setText(
       "resultPlate",
       plate
     );
-
 
     setText(
       "localQueryTime",
       "送出查詢：" +
       new Date().toLocaleString(
         "zh-TW",
-        {
-          hour12: false
-        }
+        { hour12: false }
       )
     );
 
-
     const result =
-      document.getElementById(
-        "result"
-      );
+      document.getElementById("result");
 
+    result.style.display = "block";
 
-    result.style.display =
-      "block";
+    setCard("officialCard", "loading");
 
-
-    showLoading();
-
-
-    /*
-    禁止重複按
-    */
-
-    button.disabled =
-      true;
-
-    button.textContent =
-      "查詢中...";
-
-
-    /*
-    捲到結果
-    */
-
-    setTimeout(
-      function () {
-
-        result.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-
-      },
-      100
+    setText(
+      "officialTitle",
+      "🔄 正在查詢官方失車資料..."
     );
 
+    setText(
+      "officialDescription",
+      "正在連線至官方公開資料服務。"
+    );
+
+    document.getElementById(
+      "officialDetails"
+    ).style.display = "none";
+
+    const formatResult =
+      checkPlateFormat(plate);
+
+    if (formatResult.ok) {
+      setCard("formatCard", "safe");
+      setText(
+        "formatTitle",
+        "🟢 未發現基本格式異常"
+      );
+    } else {
+      setCard("formatCard", "warning");
+      setText(
+        "formatTitle",
+        "🟠 車牌輸入格式需要確認"
+      );
+    }
+
+    setText(
+      "formatDescription",
+      formatResult.message
+    );
+
+    const consistency =
+      checkObservedConsistency(
+        type,
+        observedVehicle,
+        plateAppearance
+      );
+
+    setCard(
+      "consistencyCard",
+      consistency.state
+    );
+
+    setText(
+      "consistencyTitle",
+      consistency.title
+    );
+
+    setText(
+      "consistencyDescription",
+      consistency.message
+    );
+
+    setText(
+      "summaryResult",
+      "🔄 正在等待官方失車查詢結果..."
+    );
+
+    button.disabled = true;
+    button.textContent = "查詢中...";
+
+    setTimeout(function () {
+      result.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, 100);
+
+    let officialStatus = "ERROR";
 
     try {
 
-      /*
-      建立安全的查詢網址
-      */
-
       const params =
         new URLSearchParams({
-
           type: type,
-
           plate: plate
-
         });
 
-
-      const url =
-
-        API_BASE_URL +
-
-        "/api/vehicle?" +
-
-        params.toString();
-
-
-      /*
-      呼叫我們自己的 Render API
-      */
-
       const response =
-        await fetch(url);
-
-
-      let data;
-
-
-      try {
-
-        data =
-          await response.json();
-
-      }
-
-      catch {
-
-        throw new Error(
-          "伺服器回傳格式異常"
+        await fetch(
+          API_BASE_URL +
+          "/api/vehicle?" +
+          params.toString()
         );
 
-      }
-
-
-      /*
-      API HTTP 錯誤
-      */
+      const data =
+        await response.json();
 
       if (
         !response.ok ||
-        !data.success
+        !data.success ||
+        !data.officialResult
       ) {
-
         throw new Error(
-
           data.message ||
-
           "官方資料查詢未成功"
-
         );
-
       }
 
+      officialStatus =
+        data.officialResult.status;
 
-      /*
-      檢查資料完整性
-      */
-
-      if (
-        !data.officialResult ||
-        !data.officialResult.status
-      ) {
-
-        throw new Error(
-          "查詢結果資料不完整"
-        );
-
-      }
-
-
-      /*
-      NOT_FOUND
-      */
-
-      if (
-        data.officialResult.status ===
-        "NOT_FOUND"
-      ) {
-
-        showNotFound(
-          data
-        );
-
-      }
-
-
-      /*
-      RECORD_FOUND
-      */
-
-      else if (
-        data.officialResult.status ===
-        "RECORD_FOUND"
-      ) {
-
-        showRecordFound(
-          data
-        );
-
-      }
-
-
-      /*
-      未知狀態
-      */
-
-      else {
-
-        throw new Error(
-          "無法辨識官方查詢結果"
-        );
-
-      }
-
-    }
-
-
-    catch (error) {
-
-      console.error(
-        "Search error:",
-        error
+      setText(
+        "officialResultText",
+        data.officialResult.resultText
       );
 
-
-      showError(
-        error.message
+      setText(
+        "officialQueryTime",
+        data.officialResult.queryTime
       );
 
+      setText(
+        "officialSource",
+        data.source.name
+      );
+
+      document.getElementById(
+        "officialDetails"
+      ).style.display = "block";
+
+      if (
+        officialStatus === "NOT_FOUND"
+      ) {
+
+        setCard(
+          "officialCard",
+          "safe"
+        );
+
+        setText(
+          "officialTitle",
+          "🟢 本次官方查詢：查無資料"
+        );
+
+        setText(
+          "officialDescription",
+          "警政署公開資料服務於本次查詢回傳「查無資料」。"
+        );
+
+      } else {
+
+        setCard(
+          "officialCard",
+          "danger"
+        );
+
+        setText(
+          "officialTitle",
+          "🚨 官方查詢出現失車相關資料"
+        );
+
+        setText(
+          "officialDescription",
+          "官方公開資料服務回傳失車相關查詢結果。請勿自行攔截、追蹤或接觸車輛，如有需要請聯絡警方確認。"
+        );
+
+      }
+
+    } catch (error) {
+
+      officialStatus = "ERROR";
+
+      setCard(
+        "officialCard",
+        "warning"
+      );
+
+      setText(
+        "officialTitle",
+        "⚠️ 官方資料目前無法確認"
+      );
+
+      setText(
+        "officialDescription",
+        error.message ||
+        "本次官方資料查詢未成功完成，請稍後再試。"
+      );
+
+      document.getElementById(
+        "officialDetails"
+      ).style.display = "none";
+
+    } finally {
+
+      updateSummary(
+        officialStatus,
+        formatResult.ok,
+        consistency.state
+      );
+
+      button.disabled = false;
+      button.textContent = "🔎 一鍵查詢";
+
     }
-
-
-    finally {
-
-      /*
-      恢復按鈕
-      */
-
-      button.disabled =
-        false;
-
-      button.textContent =
-        "🔎 立即查詢";
-
-    }
-
   }
 
-
-  /*
-  ========================================
-  Enter 查詢
-  ========================================
-  */
-
   document
-    .getElementById(
-      "plateInput"
-    )
+    .getElementById("plateInput")
     .addEventListener(
       "keydown",
-      function (event) {
-
-        if (
-          event.key === "Enter"
-        ) {
-
+      function(event) {
+        if (event.key === "Enter") {
           searchVehicle();
-
         }
-
       }
     );
 
-
-  /*
-  ========================================
-  自動大寫
-  ========================================
-  */
-
   document
-    .getElementById(
-      "plateInput"
-    )
+    .getElementById("plateInput")
     .addEventListener(
       "input",
-      function () {
-
+      function() {
         this.value =
           this.value.toUpperCase();
-
       }
     );
 
 </script>
-
 
 </body>
 </html>
