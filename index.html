@@ -27,9 +27,7 @@
       min-height: 100vh;
     }
 
-    /* =========================
-       頂部
-    ========================= */
+    /* 頂部 */
 
     header {
       background: #111827;
@@ -38,29 +36,28 @@
     }
 
     .header-inner {
-      max-width: 1000px;
+      max-width: 900px;
       margin: auto;
+
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
     }
 
     .brand {
       font-size: 20px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
-    .status {
+    .header-sub {
+      color: #9ca3af;
       font-size: 13px;
-      color: #d1d5db;
     }
 
-    /* =========================
-       主內容
-    ========================= */
+    /* 主內容 */
 
     main {
-      max-width: 1000px;
+      max-width: 900px;
       margin: auto;
       padding: 50px 20px;
     }
@@ -85,62 +82,92 @@
       line-height: 1.7;
     }
 
-    /* =========================
-       查詢卡片
-    ========================= */
+    /* 查詢卡片 */
 
     .search-card {
-      background: white;
       max-width: 650px;
       margin: auto;
+
+      background: white;
+
       padding: 30px;
-      border-radius: 16px;
+
+      border-radius: 18px;
 
       box-shadow:
         0 8px 30px rgba(0, 0, 0, 0.07);
     }
 
-    .search-title {
+    .section-title {
       font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 22px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+
+      font-size: 14px;
       font-weight: 700;
-      margin-bottom: 15px;
+
+      margin-bottom: 8px;
     }
 
-    .search-row {
-      display: flex;
-      gap: 10px;
-    }
+    select,
+    input {
+      width: 100%;
 
-    .plate-input {
-      flex: 1;
-
-      padding: 16px;
+      padding: 15px;
 
       border: 2px solid #d1d5db;
       border-radius: 10px;
 
-      font-size: 20px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
+      background: white;
+
+      font-size: 16px;
 
       outline: none;
     }
 
-    .plate-input:focus {
+    select:focus,
+    input:focus {
       border-color: #111827;
     }
 
+    #plateInput {
+      font-size: 22px;
+      font-weight: 700;
+
+      letter-spacing: 2px;
+
+      text-transform: uppercase;
+    }
+
+    .helper {
+      margin-top: 7px;
+
+      color: #9ca3af;
+
+      font-size: 12px;
+    }
+
     .search-button {
+      width: 100%;
+
+      padding: 16px;
+
       border: none;
+      border-radius: 10px;
+
       background: #111827;
       color: white;
 
-      padding: 0 25px;
-
-      border-radius: 10px;
-
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 800;
 
       cursor: pointer;
     }
@@ -149,25 +176,36 @@
       background: #374151;
     }
 
-    .example {
-      margin-top: 12px;
-      font-size: 13px;
-      color: #9ca3af;
+    /* 資料來源提示 */
+
+    .source-info {
+      max-width: 650px;
+      margin: 18px auto 0;
+
+      padding: 14px 16px;
+
+      background: #eef2ff;
+
+      border-radius: 10px;
+
+      color: #4338ca;
+
+      font-size: 12px;
+      line-height: 1.6;
     }
 
-    /* =========================
-       查詢結果
-    ========================= */
+    /* 查詢結果 */
 
     .result {
       display: none;
 
       max-width: 650px;
+
       margin: 25px auto 0;
 
       background: white;
 
-      border-radius: 16px;
+      border-radius: 18px;
 
       box-shadow:
         0 8px 30px rgba(0, 0, 0, 0.07);
@@ -175,59 +213,81 @@
       overflow: hidden;
     }
 
-    .result-header {
+    .result-top {
       padding: 25px;
+
       border-bottom: 1px solid #e5e7eb;
     }
 
-    .plate-number {
-      font-size: 28px;
-      font-weight: 800;
+    .vehicle-type-label {
+      color: #6b7280;
+      font-size: 13px;
+
+      margin-bottom: 5px;
+    }
+
+    .result-plate {
+      font-size: 30px;
+      font-weight: 900;
+
       letter-spacing: 2px;
     }
 
     .query-time {
-      font-size: 12px;
+      margin-top: 7px;
+
       color: #9ca3af;
-      margin-top: 5px;
+
+      font-size: 12px;
     }
 
-    .result-body {
+    .result-content {
       padding: 25px;
     }
 
-    .check-item {
+    .data-row {
       display: flex;
+
       justify-content: space-between;
       align-items: center;
 
-      padding: 16px 0;
+      gap: 15px;
 
-      border-bottom: 1px solid #f0f0f0;
+      padding: 17px 0;
+
+      border-bottom: 1px solid #f3f4f6;
     }
 
-    .check-item:last-child {
+    .data-row:last-child {
       border-bottom: none;
     }
 
-    .check-name {
-      font-weight: 600;
+    .data-name {
+      font-weight: 700;
     }
 
-    .check-description {
-      font-size: 13px;
-      color: #6b7280;
+    .data-description {
       margin-top: 4px;
+
+      color: #6b7280;
+
+      font-size: 12px;
     }
 
     .badge {
-      padding: 6px 10px;
+      flex-shrink: 0;
+
+      padding: 6px 11px;
+
       border-radius: 20px;
 
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
+    }
 
-      white-space: nowrap;
+    .pending {
+      background: #f3f4f6;
+      color: #4b5563;
     }
 
     .safe {
@@ -235,54 +295,40 @@
       color: #166534;
     }
 
-    .warning {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .unknown {
-      background: #f3f4f6;
-      color: #4b5563;
-    }
-
-    /* =========================
-       風險結果
-    ========================= */
+    /* 風險卡 */
 
     .risk-box {
       margin-top: 20px;
 
-      background: #f9fafb;
-
       padding: 20px;
+
+      background: #f9fafb;
 
       border-radius: 12px;
     }
 
-    .risk-title {
-      font-size: 13px;
+    .risk-small {
       color: #6b7280;
+      font-size: 12px;
     }
 
-    .risk-level {
+    .risk-result {
       margin-top: 6px;
 
-      font-size: 22px;
-      font-weight: 800;
+      font-size: 21px;
+      font-weight: 900;
     }
 
-    .notice {
-      margin-top: 15px;
+    .warning-text {
+      margin-top: 16px;
 
-      font-size: 12px;
       color: #6b7280;
 
+      font-size: 12px;
       line-height: 1.7;
     }
 
-    /* =========================
-       快速功能
-    ========================= */
+    /* 功能區 */
 
     .features {
       max-width: 650px;
@@ -290,7 +336,9 @@
       margin: 40px auto 0;
 
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+
+      grid-template-columns:
+        repeat(3, 1fr);
 
       gap: 15px;
     }
@@ -306,14 +354,6 @@
 
       box-shadow:
         0 4px 18px rgba(0, 0, 0, 0.05);
-
-      cursor: pointer;
-
-      transition: 0.2s;
-    }
-
-    .feature:hover {
-      transform: translateY(-3px);
     }
 
     .feature-icon {
@@ -322,36 +362,30 @@
     }
 
     .feature-title {
-      font-weight: 700;
       font-size: 14px;
+      font-weight: 800;
     }
 
-    .feature-text {
+    .feature-description {
       margin-top: 5px;
 
-      font-size: 12px;
       color: #6b7280;
 
+      font-size: 12px;
       line-height: 1.5;
     }
 
-    /* =========================
-       Footer
-    ========================= */
-
     footer {
-      text-align: center;
-
       padding: 40px 20px;
+
+      text-align: center;
 
       color: #9ca3af;
 
       font-size: 12px;
-    }
 
-    /* =========================
-       手機版
-    ========================= */
+      line-height: 1.7;
+    }
 
     @media (max-width: 650px) {
 
@@ -367,27 +401,22 @@
         padding: 22px;
       }
 
-      .search-row {
-        flex-direction: column;
-      }
-
-      .search-button {
-        padding: 15px;
-      }
-
       .features {
         grid-template-columns: 1fr;
       }
 
-      .status {
+      .header-sub {
         display: none;
       }
+
     }
 
   </style>
 </head>
 
+
 <body>
+
 
 <header>
 
@@ -397,7 +426,7 @@
       🚘 車輛風險查詢
     </div>
 
-    <div class="status">
+    <div class="header-sub">
       Vehicle Risk Check
     </div>
 
@@ -408,7 +437,8 @@
 
 <main>
 
-  <!-- 首頁標題 -->
+
+  <!-- 首頁介紹 -->
 
   <section class="hero">
 
@@ -421,46 +451,113 @@
     </h1>
 
     <p>
-      輸入車牌號碼，查詢車輛失竊、協尋<br>
-      及平台異常通報相關資訊
+      輸入牌照種類與車牌號碼<br>
+      查詢失竊、協尋及異常通報相關資訊
     </p>
 
   </section>
 
 
-  <!-- 查詢 -->
+  <!-- 查詢表單 -->
 
   <section class="search-card">
 
-    <div class="search-title">
+    <div class="section-title">
       車牌快速查詢
     </div>
 
-    <div class="search-row">
+
+    <!-- 牌照種類 -->
+
+    <div class="form-group">
+
+      <label for="vehicleType">
+        牌照種類
+      </label>
+
+      <select id="vehicleType">
+
+        <option value="A">
+          汽車
+        </option>
+
+        <option value="B">
+          重型機車
+        </option>
+
+        <option value="C">
+          輕型機車
+        </option>
+
+        <option value="S">
+          微型電動二輪車
+        </option>
+
+        <option value="T">
+          拖車
+        </option>
+
+        <option value="G">
+          動力機械車
+        </option>
+
+        <option value="TEMP">
+          臨時牌
+        </option>
+
+        <option value="R">
+          試車牌
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- 車牌 -->
+
+    <div class="form-group">
+
+      <label for="plateInput">
+        車牌號碼
+      </label>
 
       <input
         id="plateInput"
-        class="plate-input"
         type="text"
-        placeholder="ABC-1234"
-        maxlength="10"
+        placeholder="例如：ABC-1234"
+        maxlength="15"
         autocomplete="off"
       >
 
-      <button
-        class="search-button"
-        onclick="searchVehicle()"
-      >
-        立即查詢
-      </button>
+      <div class="helper">
+        請依車牌實際內容輸入完整號碼
+      </div>
 
     </div>
 
-    <div class="example">
-      請輸入完整車牌號碼，例如：ABC-1234
-    </div>
+
+    <!-- 查詢 -->
+
+    <button
+      class="search-button"
+      onclick="searchVehicle()"
+    >
+      🔎 立即查詢
+    </button>
 
   </section>
+
+
+  <!-- 官方資料提示 -->
+
+  <div class="source-info">
+
+    🛡️ 本平台規劃整合政府公開之車輛失竊相關資料。
+
+    查詢結果應以警政及相關主管機關正式資料為準。
+
+  </div>
 
 
   <!-- 查詢結果 -->
@@ -470,11 +567,18 @@
     class="result"
   >
 
-    <div class="result-header">
+    <div class="result-top">
+
+      <div
+        id="resultVehicleType"
+        class="vehicle-type-label"
+      >
+        汽車
+      </div>
 
       <div
         id="resultPlate"
-        class="plate-number"
+        class="result-plate"
       >
         ABC-1234
       </div>
@@ -488,73 +592,74 @@
     </div>
 
 
-    <div class="result-body">
+    <div class="result-content">
+
 
       <!-- 官方失竊 -->
 
-      <div class="check-item">
+      <div class="data-row">
 
         <div>
 
-          <div class="check-name">
-            官方失竊資訊
+          <div class="data-name">
+            🚨 車輛／號牌失竊資訊
           </div>
 
-          <div class="check-description">
-            車輛及號牌失竊相關資料
+          <div class="data-description">
+            政府公開之車輛失竊相關資訊
           </div>
 
         </div>
 
-        <span class="badge unknown">
-          尚未串接
-        </span>
+        <div class="badge pending">
+          尚未連線
+        </div>
 
       </div>
 
 
       <!-- 協尋 -->
 
-      <div class="check-item">
+      <div class="data-row">
 
         <div>
 
-          <div class="check-name">
-            平台協尋紀錄
+          <div class="data-name">
+            📢 平台協尋紀錄
           </div>
 
-          <div class="check-description">
-            查詢平台內的車輛協尋案件
+          <div class="data-description">
+            本平台建立之公開車輛協尋案件
           </div>
 
         </div>
 
-        <span class="badge safe">
+        <div class="badge safe">
           無紀錄
-        </span>
+        </div>
 
       </div>
 
 
-      <!-- 通報 -->
+      <!-- 異常通報 -->
 
-      <div class="check-item">
+      <div class="data-row">
 
         <div>
 
-          <div class="check-name">
-            異常車輛通報
+          <div class="data-name">
+            ⚠️ 異常車輛通報
           </div>
 
-          <div class="check-description">
-            疑似套牌、車牌異常及其他通報
+          <div class="data-description">
+            疑似套牌、車牌異常及其他經審核通報
           </div>
 
         </div>
 
-        <span class="badge safe">
+        <div class="badge safe">
           無紀錄
-        </span>
+        </div>
 
       </div>
 
@@ -563,27 +668,27 @@
 
       <div class="risk-box">
 
-        <div class="risk-title">
-          目前查詢結果
+        <div class="risk-small">
+          目前查詢狀態
         </div>
 
-        <div class="risk-level">
-          ⚪ 尚無風險資料
+        <div class="risk-result">
+          ⚪ 等待完整資料查詢
         </div>
 
-        <div class="notice">
+        <div class="warning-text">
 
-          本平台提供之資訊僅供車輛安全風險查詢與參考。
+          目前此版本尚未連接官方失竊資料來源，
+          因此本頁顯示內容不可作為判定車輛是否失竊的依據。
 
           <br><br>
 
-          「未查得紀錄」不代表車輛絕對無異常；
-          民眾通報亦不代表該車輛或車主涉及違法行為。
+          未來若查無紀錄，也不代表車輛絕對無異常。
 
           <br><br>
 
-          如發現疑似失竊車輛、偽造或變造號牌，
-          請勿自行攔截、追蹤或與駕駛發生衝突，
+          如現場發現疑似失竊、套牌或其他可疑車輛，
+          請勿自行攔截、跟蹤或與駕駛發生衝突，
           應聯絡警方處理。
 
         </div>
@@ -595,7 +700,7 @@
   </section>
 
 
-  <!-- 快速功能 -->
+  <!-- 未來功能 -->
 
   <section class="features">
 
@@ -609,8 +714,8 @@
         失竊／協尋
       </div>
 
-      <div class="feature-text">
-        查詢失竊及車輛協尋資訊
+      <div class="feature-description">
+        查詢失竊及公開協尋資訊
       </div>
 
     </div>
@@ -626,8 +731,8 @@
         異常車輛通報
       </div>
 
-      <div class="feature-text">
-        通報疑似套牌或異常車輛
+      <div class="feature-description">
+        通報疑似套牌或其他異常
       </div>
 
     </div>
@@ -643,13 +748,14 @@
         車輛協尋中心
       </div>
 
-      <div class="feature-text">
-        查看目前公開協尋案件
+      <div class="feature-description">
+        查看經審核之公開協尋案件
       </div>
 
     </div>
 
   </section>
+
 
 </main>
 
@@ -658,10 +764,9 @@
 
   車輛風險查詢平台
 
-  <br><br>
+  <br>
 
-  本平台非政府機關或執法單位，
-  查詢結果應以主管機關正式資料為準。
+  本平台非政府機關或執法單位。
 
 </footer>
 
@@ -670,7 +775,7 @@
 
   /*
   ==============================
-  車牌格式整理
+  車牌整理
   ==============================
   */
 
@@ -686,28 +791,39 @@
 
   /*
   ==============================
-  查詢功能
+  查詢
   ==============================
   */
 
   function searchVehicle() {
 
-    const input =
-      document.getElementById("plateInput");
+    const typeSelect =
+      document.getElementById(
+        "vehicleType"
+      );
+
+    const plateInput =
+      document.getElementById(
+        "plateInput"
+      );
 
     const plate =
-      normalizePlate(input.value);
+      normalizePlate(
+        plateInput.value
+      );
 
 
     /*
-    沒輸入車牌
+    未輸入車牌
     */
 
     if (!plate) {
 
-      alert("請輸入車牌號碼");
+      alert(
+        "請輸入車牌號碼"
+      );
 
-      input.focus();
+      plateInput.focus();
 
       return;
 
@@ -715,12 +831,31 @@
 
 
     /*
-    顯示查詢結果
+    取得牌照種類名稱
+    */
+
+    const vehicleTypeName =
+
+      typeSelect.options[
+        typeSelect.selectedIndex
+      ].text.trim();
+
+
+    /*
+    更新結果
     */
 
     document.getElementById(
+      "resultVehicleType"
+    ).textContent =
+      "牌照種類：" +
+      vehicleTypeName;
+
+
+    document.getElementById(
       "resultPlate"
-    ).textContent = plate;
+    ).textContent =
+      plate;
 
 
     /*
@@ -733,7 +868,9 @@
     document.getElementById(
       "queryTime"
     ).textContent =
+
       "查詢時間：" +
+
       now.toLocaleString(
         "zh-TW",
         {
@@ -743,18 +880,20 @@
 
 
     /*
-    顯示結果區塊
+    顯示結果
     */
 
     const result =
-      document.getElementById("result");
+      document.getElementById(
+        "result"
+      );
 
     result.style.display =
       "block";
 
 
     /*
-    自動滑到結果
+    捲動
     */
 
     setTimeout(
@@ -774,17 +913,21 @@
 
   /*
   ==============================
-  按 Enter 也可以查詢
+  Enter 查詢
   ==============================
   */
 
   document
-    .getElementById("plateInput")
+    .getElementById(
+      "plateInput"
+    )
     .addEventListener(
       "keydown",
       function (event) {
 
-        if (event.key === "Enter") {
+        if (
+          event.key === "Enter"
+        ) {
 
           searchVehicle();
 
@@ -796,12 +939,14 @@
 
   /*
   ==============================
-  輸入時自動轉大寫
+  自動大寫
   ==============================
   */
 
   document
-    .getElementById("plateInput")
+    .getElementById(
+      "plateInput"
+    )
     .addEventListener(
       "input",
       function () {
