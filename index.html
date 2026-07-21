@@ -761,6 +761,10 @@
           plate: plate
         });
 
+      if (observedVehicle) {
+        params.set("observedVehicle", observedVehicle);
+      }
+
       const response =
         await fetch(
           API_BASE_URL +
@@ -782,22 +786,54 @@
         );
       }
 
+      /*
+      ========================================
+      使用 v2 後端統一結果
+      ========================================
+      */
+
+      const official =
+        data.officialStolenVehicleCheck;
+
+      const backendPlateAnalysis =
+        data.plateAnalysis;
+
+      const backendConsistency =
+        data.consistencyAnalysis;
+
+      const backendOverall =
+        data.overall;
+
+      if (
+        !official ||
+        !backendPlateAnalysis ||
+        !backendConsistency ||
+        !backendOverall
+      ) {
+        throw new Error(
+          "後端分析資料不完整"
+        );
+      }
+
       officialStatus =
-        data.officialResult.status;
+        official.status;
 
       setText(
         "officialResultText",
-        data.officialResult.resultText
+        official.resultText
       );
 
       setText(
         "officialQueryTime",
-        data.officialResult.queryTime
+        official.queryTime
       );
 
       setText(
         "officialSource",
-        data.source.name
+        official.source &&
+        official.source.name
+          ? official.source.name
+          : "內政部警政署公開資料服務"
       );
 
       document.getElementById(
@@ -842,6 +878,145 @@
 
       }
 
+      /*
+      後端號牌基本格式分析
+      */
+
+      if (
+        backendPlateAnalysis.basicFormatValid
+      ) {
+
+        setCard(
+          "formatCard",
+          "safe"
+        );
+
+        setText(
+          "formatTitle",
+          "🟢 未發現基本格式異常"
+        );
+
+      } else {
+
+        setCard(
+          "formatCard",
+          "warning"
+        );
+
+        setText(
+          "formatTitle",
+          "🟠 車牌輸入格式需要確認"
+        );
+
+      }
+
+      setText(
+        "formatDescription",
+        backendPlateAnalysis.message +
+        (
+          backendPlateAnalysis.issues &&
+          backendPlateAnalysis.issues.length
+            ? " 問題：" +
+              backendPlateAnalysis.issues.join("、")
+            : ""
+        )
+      );
+
+      /*
+      後端車種一致性分析
+      */
+
+      if (
+        backendConsistency.status ===
+        "OBSERVATION_CONFLICT"
+      ) {
+
+        setCard(
+          "consistencyCard",
+          "warning"
+        );
+
+        setText(
+          "consistencyTitle",
+          "🟠 發現需要再次確認的車種線索"
+        );
+
+      } else if (
+        backendConsistency.status ===
+        "NOT_CHECKED"
+      ) {
+
+        setCard(
+          "consistencyCard",
+          "warning"
+        );
+
+        setText(
+          "consistencyTitle",
+          "⚪ 未進行進階車種一致性檢查"
+        );
+
+      } else {
+
+        setCard(
+          "consistencyCard",
+          "safe"
+        );
+
+        setText(
+          "consistencyTitle",
+          "🟢 未發現明顯的車種資料矛盾"
+        );
+
+      }
+
+      setText(
+        "consistencyDescription",
+        backendConsistency.message
+      );
+
+      /*
+      後端 overall 綜合判斷
+      */
+
+      if (
+        backendOverall.status ===
+        "HIGH_ATTENTION"
+      ) {
+
+        setText(
+          "summaryResult",
+          "🚨 官方失車查詢出現相關資料，請依官方結果處理並由警方進一步確認。"
+        );
+
+      } else if (
+        backendOverall.status ===
+        "REVIEW_INPUT"
+      ) {
+
+        setText(
+          "summaryResult",
+          "🟠 官方本次未顯示失車資料，但輸入格式或觀察資訊有需要再次確認的項目。"
+        );
+
+      } else if (
+        backendOverall.status ===
+        "NO_FLAG_FOUND"
+      ) {
+
+        setText(
+          "summaryResult",
+          "🟢 官方本次查無失車資料，且後端基本分析未發現明顯輸入或觀察資料矛盾。"
+        );
+
+      } else {
+
+        setText(
+          "summaryResult",
+          "⚠️ 已完成查詢，但無法辨識綜合分析狀態。"
+        );
+
+      }
     } catch (error) {
 
       officialStatus = "ERROR";
@@ -868,11 +1043,18 @@
 
     } finally {
 
-      updateSummary(
-        officialStatus,
-        formatResult.ok,
-        consistency.state
-      );
+      /*
+      v2 成功時綜合結果已由後端 overall 決定；
+      若官方 API 查詢失敗，才在這裡顯示失敗狀態。
+      */
+
+      if (officialStatus === "ERROR") {
+        updateSummary(
+          "ERROR",
+          formatResult.ok,
+          consistency.state
+        );
+      }
 
       button.disabled = false;
       button.textContent = "🔎 一鍵查詢";
